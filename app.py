@@ -1,6 +1,4 @@
 from flask import Flask, render_template, url_for, redirect, jsonify, request
-from flask_mail import Mail, Message
-from random import randint
 from flask_bcrypt import Bcrypt, generate_password_hash, check_password_hash
 from flask_jwt_extended import JWTManager, create_access_token, jwt_required, get_jwt_identity
 from flask_login import UserMixin, login_user, LoginManager, login_required, logout_user, current_user
@@ -14,16 +12,6 @@ app = Flask(__name__)
 app.config['JWT_SECRET_KEY'] = 'secretkey'
 jwt = JWTManager(app)
 bcrypt = Bcrypt(app)
-
-app.config["MAIL_SERVER"] = 'smtp.gmail.com'
-app.config["MAIL_PORT"] = 465
-app.config["MAIL_USERNAME"] = 'tst.testingapi@gmail.com'
-app.config['MAIL_PASSWORD'] = 'msnkojkdjsxmkywo'                    
-app.config['MAIL_USE_TLS'] = False
-app.config['MAIL_USE_SSL'] = True
-mail = Mail(app)
-
-otp = randint(000000,999999)
 
 db = mysql.connector.connect(
     host = "localhost",
@@ -69,26 +57,6 @@ db_cursor = db.cursor()
 # @app.route('/')
 # def home():
 #     return render_template('home.html')
-
-
-
-# Verify Email
-@app.route('/verify', methods = ["POST"])
-def verify():
-    email = request.json.get('email', None)
-    msg = Message(subject = 'OTP', sender = 'tst.testingapi@gmail.com', recipients = [email])
-    msg.body = str(otp)
-    mail.send(msg)
-    return jsonify({'Message' : 'OTP Sent'})
-
-# Validate Email
-@app.route('/check', methods = ["POST"])
-def validate():
-    user_otp = request.json.get('OTP', None)
-    if str(otp) == str(user_otp):
-        db_cursor.execute('SELECT * FROM melb_data')
-        return jsonify(db_cursor.fetchall())
-    return jsonify({'Message' : 'Wrong OTP'})
 
 # Register
 @app.route("/register", methods = ["POST"])
