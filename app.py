@@ -22,74 +22,47 @@ db = mysql.connector.connect(
 
 db_cursor = db.cursor()
 
-# class User(db_cursor.Model, UserMixin):
-#     id = db_cursor.Column(db_cursor.Integer, primary_key=True)
-#     username = db_cursor.Column(db_cursor.String(20), nullable=False, unique=True)
-#     password = db_cursor.Column(db_cursor.String(80), nullable=False)
-
-# class RegisterForm(FlaskForm):
-#     username = StringField(validators=[
-#                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-#     password = PasswordField(validators=[
-#                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-#     submit = SubmitField('Register')
-
-#     def validate_username(self, username):
-#         existing_user_username = User.query.filter_by(
-#             username=username.data).first()
-#         if existing_user_username:
-#             raise ValidationError(
-#                 'That username already exists. Please choose a different one.')
-
-
-# class LoginForm(FlaskForm):
-#     username = StringField(validators=[
-#                            InputRequired(), Length(min=4, max=20)], render_kw={"placeholder": "Username"})
-
-#     password = PasswordField(validators=[
-#                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
-
-#     submit = SubmitField('Login')
-
-# Dashboard
-# @app.route('/')
-# def home():
-#     return render_template('home.html')
+# Page Awal
+@app.route('/')
+def loginPage():
+    return render_template('login.html')
 
 # Register
-@app.route("/register", methods = ["POST"])
+@app.route("/register", methods = ["POST" , "GET"])
 def register():
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
+    if request.method == "POST" :
+        username = request.form['username']
+        password = request.form['password']
 
-    db_cursor.execute("SELECT * FROM user_data WHERE username = %s", [username])
-    user = db_cursor.fetchone()
-    if user:
-        return jsonify({'Message' : 'User Already Exist'}), 403
-    
-    hashed = generate_password_hash(password)
-    db_cursor.execute("INSERT INTO user_data (username, password) VALUES (%s,%s)", [username, hashed])
-    db.commit()
+        db_cursor.execute("SELECT * FROM user_data WHERE username = %s", [username])
+        user = db_cursor.fetchone()
+        if user:
+            return render_template('register.html', session_info = "Username already registered")
+        
+        hashed = generate_password_hash(password)
+        db_cursor.execute("INSERT INTO user_data (username, password) VALUES (%s,%s)", [username, hashed])
+        db.commit()
 
-    return jsonify({'Message' : 'Account Registed'}), 200
+        return render_template('register.html')
+
+    return render_template('register.html')
 
 # Login
-@app.route("/login", methods = ["POST"])
+@app.route("/login", methods = ["POST" , "GET"])
 def login():
-    # authorization = request.authorization
-    # if not authorization or not authorization.username or not authorization.password:
-    username = request.json.get('username', None)
-    password = request.json.get('password', None)
+    if request.method == "POST" :
+        username = request.form['username']
+        password = request.form['password']
 
-    db_cursor.execute("SELECT * FROM user_data WHERE username = %s", [username])
-    user = db_cursor.fetchone()
+        db_cursor.execute("SELECT * FROM user_data WHERE username = %s", [username])
+        user = db_cursor.fetchone()
 
-    if check_password_hash(user[2], password):
-        token = create_access_token(identity = user[1], expires_delta = timedelta(minutes = 1))
-        return jsonify({'Token' : token}), 200
-    return jsonify({'Message' : 'Login Failed, Wrong Password'})
+        if check_password_hash(user[2], password):
+            token = create_access_token(identity = user[1], expires_delta = timedelta(minutes = 30))
+            return jsonify({'Token' : token}), 200
+        return render_template('login.html', session_info = "Wrong Password")
+
+    return render_template('login.html')
 
 @app.route("/view", methods=["GET"])
 @jwt_required()
