@@ -5,7 +5,7 @@
     <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
     <link rel = "stylesheet" href = "../static/login.css">
-    <title>Login Dashboard</title>
+    <title>Home Dashboard</title>
 </head>
 
 <body>
@@ -22,14 +22,11 @@
              <input id="password" type="password" name="password" required>
              <label>Password</label>
           </div>
-            <!-- <div id="wrong_session" class="session_info" style="display:none">
-               Wrong Password
-            </div> -->
-            {% if session_info != '' %}
-            <div id="wrong_session" class="session_info">
+          {% if session_info != "" %}
+            <div class="session_info">
                {{ session_info }}
             </div>
-            {% endif %}
+          {% endif %}
           <div class="field">
              <input type="submit" value="Login">
           </div>
@@ -40,26 +37,19 @@
     </div>
 </body>
 <script>
-   var form = document.getElementById("loginForm");
+   // console.log("babi kau");
+   // var form = document.getElementById("loginForm");
    // function submitHandler(e) {
    //    e.preventDefault();
    //    const uname = document.getElementById('username').value
    //    const pw = document.getElementById('password').value
-   //    console.log("Submitted!");
+   //    console.log("clicked");
    //    console.log(uname);
    //    console.log(pw);
 
    //    var xhr = new XMLHttpRequest();
-   //    xhr.open("POST", '/login');
+   //    xhr.open("POST", '/login', true);
    //    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-   //    xhr.onload = () => {
-   //       if(xhr.status==200) {
-   //          window.location.href="/view";
-   //       } 
-   //       else if (xhr.status==201) {
-   //          document.getElementById('wrong_session').style.display = "block"
-   //       }
-   //    };
    //    xhr.send("username=" + uname + "&password=" + pw + "");
    // };
    // form.addEventListener("submit", submitHandler);
