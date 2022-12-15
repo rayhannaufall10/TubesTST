@@ -113,7 +113,7 @@ def roomarea():
     landsize = request.json.get('landsize', None)
     bedroom = request.json.get('bedroom', None)
 
-    db_cursor.execute("SELECT rooms, bedroom, bathroom, car, landsize FROM house WHERE landsize <= %s and landsize > '0' and bedroom = %s", [landsize], [bedroom])
+    db_cursor.execute("SELECT rooms, bedroom, bathroom, car, landsize FROM house WHERE landsize <= %s and landsize IS NOT NULL and bedroom = %s ORDER BY landsize DESC", [landsize, bedroom])
     house = db_cursor.fetchall()
     houseList = []
 
