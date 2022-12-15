@@ -4,54 +4,33 @@
     <meta charset = "UTF-8">
     <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
     <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
-    <link rel = "stylesheet" href = "../static/login.css">
+    <link rel = "stylesheet" href = "../static/home.css">
     <title>Home Dashboard</title>
 </head>
 
 <body>
     <div class="wrapper">
        <div class="title">
-          Login
+         Dream House
        </div>
-       <form id="loginForm" method = "POST" action = "/login">
+       <form id="loginForm" method = "POST" action = "/recommendation">
           <div class="field">
-             <input id="username" type="text" name="username" required>
-             <label>Username</label>
+             <input id="Budget" type="number" name="user-budget" required>
+             <label>Your Budget</label>
           </div>
           <div class="field">
-             <input id="password" type="password" name="password" required>
-             <label>Password</label>
-          </div>
-          {% if session_info != "" %}
-            <div class="session_info">
-               {{ session_info }}
-            </div>
-          {% endif %}
-          <div class="field">
-             <input type="submit" value="Login">
-          </div>
-          <div class="signup-link">
-             Not a member? <a href="{{url_for('register')}}">Signup now</a>
-          </div>
+            <input id="house-saving" type="number" name="house-saving" required>
+            <label>House Saving (%)</label>
+         </div>
+         <div class="field">
+            <input id="furniture-saving" type="number" name="furniture-saving" required>
+            <label>Furniture Saving (%)</label>
+         </div>
+         <br>
+         <div class="field">
+            <input type="submit" name="Search" value="Search House">
+         </div>
        </form>
     </div>
 </body>
-<script>
-   // console.log("babi kau");
-   // var form = document.getElementById("loginForm");
-   // function submitHandler(e) {
-   //    e.preventDefault();
-   //    const uname = document.getElementById('username').value
-   //    const pw = document.getElementById('password').value
-   //    console.log("clicked");
-   //    console.log(uname);
-   //    console.log(pw);
-
-   //    var xhr = new XMLHttpRequest();
-   //    xhr.open("POST", '/login', true);
-   //    xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
-   //    xhr.send("username=" + uname + "&password=" + pw + "");
-   // };
-   // form.addEventListener("submit", submitHandler);
-</script>
 </html>

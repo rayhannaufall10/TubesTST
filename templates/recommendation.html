@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang = "en">
+<head>
+    <meta charset = "UTF-8">
+    <meta http-equiv = "X-UA-Compatible" content = "IE=edge">
+    <meta name = "viewport" content = "width=device-width, initial-scale=1.0">
+    <link rel = "stylesheet" href = "../static/recommendation.css">
+    <title>Recommendation</title>
+</head>
+
+<body>
+    <h1 id="House List">List of Affordable House</h1>
+    <h2><a href="#Furniture List">Go To Furniture Section</a></h2>
+    <div class="table-wrapper">
+        <table class="fl-table">
+            <thead>
+            <tr>
+                <th>Id_House</th>
+                <th>Suburb</th>
+                <th>Address</th>
+                <th>Rooms</th>
+                <th>Price</th>
+                <th>Seller</th>
+                <th>Date</th>
+                <th>Distance</th>
+                <th>Bedroom</th>
+                <th>Bathroom</th>
+                <th>Car</th>
+                <th>Landsize</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for row in output_house %}
+                <tr>
+                    <td>{{row[0]}}</td>
+                    <td>{{row[1]}}</td>
+                    <td>{{row[2]}}</td>
+                    <td>{{row[3]}}</td>
+                    <td>{{row[4]}}</td>
+                    <td>{{row[5]}}</td>
+                    <td>{{row[6]}}</td>
+                    <td>{{row[7]}}</td>
+                    <td>{{row[8]}}</td>
+                    <td>{{row[9]}}</td>
+                    <td>{{row[10]}}</td>
+                    <td>{{row[11]}}</td>
+                </tr>
+                {% endfor %}
+            <tbody>
+        </table>
+    </div>
+
+    <h1 id="Furniture List">List of Affordable Furniture</h1>
+    <h2><a href="#House List">Go To House Section</a></h2>
+    <div class="table-wrapper">
+        <table class="fl-table">
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Short Description</th>
+                <th>Link</th>
+            </tr>
+            </thead>
+            <tbody>
+                {% for row in output_furniture %}
+                <tr>
+                    <td>{{row["name"]}}</td>
+                    <td>{{row["category"]}}</td>
+                    <td>{{row["price"]}}</td>
+                    <td>{{row["short_description"]}}</td>
+                    <td>{{row["link"]}}</td>
+                </tr>
+                {% endfor %}
+            <tbody>
+        </table>
+    </div>
+
+</body>
+</html>

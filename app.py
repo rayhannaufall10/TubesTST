@@ -5,6 +5,7 @@ from datetime import timedelta
 import os
 import psycopg2
 from dotenv import load_dotenv
+import requests
 
 load_dotenv()
 
@@ -68,12 +69,31 @@ def login_post():
 
     if check_password_hash(user[2], password):
         token = create_access_token(identity = user[1], expires_delta = timedelta(minutes = 5))
-        resp = make_response(redirect('/view'))
+        resp = make_response(redirect('/recommendation'))
         resp.set_cookie('access_token_cookie', token)
         return resp
     return render_template('login.html', session_info = "Wrong Password")
 
-# logout
+# Login Akmal
+@app.route("/loginuser", methods=["POST"])
+def loginuser():
+    username = request.form['username']
+    password = request.form['password']
+
+    if not username or not password:
+        return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+    db_cursor.execute("select * from users where username=%s", (username,))
+    user = db_cursor.fetchone()
+    if not user:
+        return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+    if check_password_hash(user[2], password):
+        access_token = create_access_token(identity=user[1], expires_delta=timedelta(minutes=30))
+        return jsonify({'token': access_token}), 200
+    return make_response('could not verify', 401, {'WWW.Authentication': 'Basic realm: "login required"'})
+
+# Logout
 @app.get("/logout")
 def logout():
     # resp = make_response('remove cookie')
@@ -88,10 +108,12 @@ def roomareaget():
     return render_template('test.html')
 
 @app.post("/roomarea")
+@jwt_required(locations="headers")
 def roomarea():
-    landsize = request.json.get['landsize']
+    landsize = request.json.get('landsize', None)
+    bedroom = request.json.get('bedroom', None)
 
-    db_cursor.execute("SELECT rooms, bedroom, bathroom, car, landsize FROM house WHERE landsize <= %s and landsize > 0", [landsize])
+    db_cursor.execute("SELECT rooms, bedroom, bathroom, car, landsize FROM house WHERE landsize <= %s and landsize > '0' and bedroom = %s", [landsize], [bedroom])
     house = db_cursor.fetchall()
     houseList = []
 
@@ -102,11 +124,43 @@ def roomarea():
         bathroom_area = (float(house[i][4]) - car_area - rooms_area) * 0.1
         bedroom_area = (((float(house[i][4]) - car_area - rooms_area - bathroom_area)/float(house[i][1]))*10000)
 
-        newItem = list(house[i])
-        newItem.append(bedroom_area)
+        newItem = {
+            "rooms": house[i][0],
+            "bedroom": house[i][1],
+            "bathroom": house[i][2],
+            "car": house[i][3],
+            "landsize": house[i][4],
+            "bedroom_area": bedroom_area
+        }
+        
         houseList.append(newItem)
     
     return jsonify(houseList)
+
+@app.route("/recommendation", methods=["GET" , "POST"])
+def recommendation():
+    if (request.method=="POST"):
+        budget = float(request.form['user-budget'])
+        house = float(request.form['house-saving'])
+        furniture = float(request.form['furniture-saving'])
+
+        url_login = requests.post("https://tubeststakmal.azurewebsites.net/api/v1/login", data = {"username" : "admin" ,"password" : "pwadmin"})
+        tokenAkmal = url_login.json().get("token")
+
+        recommendation_url = "https://tubeststakmal.azurewebsites.net/api/v1/rekomendasi"
+        jar = requests.cookies.RequestsCookieJar()
+        jar.set('access_token_cookie', tokenAkmal, domain='tubeststakmal.azurewebsites.net', path='/')
+
+        rec_furniture = requests.post(recommendation_url, cookies=jar, headers={'Authorization' : 'Bearer ' + tokenAkmal, 'Content-type' : 'application/json'} ,json={"price" : budget, "bobot" : furniture})
+        furniture_list = rec_furniture.json()
+        
+        price_house = str((house/100) * budget)
+        db_cursor.execute("SELECT * FROM house WHERE price <= %s and landsize > '0' ", [price_house])
+        house = db_cursor.fetchall()
+
+        return render_template('recommendation.html', output_house = house, output_furniture = furniture_list)
+    else:
+        return render_template('home.html')
 
 @app.route("/view", methods=["GET"])
 @jwt_required()
